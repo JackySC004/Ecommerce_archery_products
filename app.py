@@ -22,12 +22,20 @@ class User(UserMixin,db.Model):
     email=db.Column(db.String(100))
     password=db.Column(db.String(100))
 
+class Product(db.Model):
+    id=db.Column(db.Integer, primary_key=True)
+    name=db.Column(db.String(60))
+    img_url=db.Column(db.String(100))
+    price=db.Column(db.Integer)
+    description=db.Column(db.String(100))
+
+
 with app.app_context():
     db.create_all()
 
-@app.route('/menu', methods=['POST', 'GET'])
-def menu():
-    return render_template('menu.html')
+@app.route('/home', methods=['POST', 'GET'])
+def home():
+    return render_template('home.html')
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -35,7 +43,7 @@ def register():
         name= request.form['name']
         email=request.form['email']
         password=request.form['password']
-        new_user=User(name=name, email=email,password=password)
+        new_user=User(name=name, email=email, password=password)
         db.session.add(new_user)
         db.session.commit()
     return render_template('register.html')
@@ -49,8 +57,26 @@ def login():
         user=User.query.filter_by(email=email).first()
         if user and password == user.password:
             login_user(user)
-            return redirect('/products_view')
+            return redirect('/menu')
     return render_template('login.html')
+
+@app.route('/menu', methods=['POST', 'GET'])
+@login_required
+def menu():
+    return render_template('menu.html')
+
+@app.route('/add_product', methods=['POST','GET'])
+@login_required
+def add_product():
+    if request.method == 'POST':
+        img_url=request.form['img_url']
+        name=request.form['name']
+        price=request.form['price']
+        description=request.form['description']
+        new_product=Product(img_url=img_url, name=name, price=price, description=description)
+        db.session.add(new_product)
+        db.session.commit()
+    return render_template('add_product.html')
 
 
 @app.route('/products_view', methods=['POST', 'GET'])

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar producto</title>
+</head>
+<body>
+    <div>
+        <form method="post" action="/add_product">
+            <h1>Ingresa los datos del producto</h1>
+            <h2>Imagen del producto</h2>
+            <input type="text" id="img_url" name="img_url">
+            <h2>Nombre del producto</h2>
+            <input type="text" name="name" id="name">
+            <h2>Precio</h2>
+            <input type="number" name="price" id="price">
+            <h2>Descripcion</h2>
+            <input type="text" name="description" id="description">
+            <button type="submit">Agregar producto</button>
+
+        </form>
+    </div>
+</body>
+</html>
