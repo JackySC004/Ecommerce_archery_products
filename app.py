@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin, LoginManager, login_user, login_required, logout_user
+from flask_login import UserMixin, LoginManager, login_user, login_required, logout_user, current_user
 
 
 app=Flask(__name__)
@@ -21,6 +21,7 @@ class User(UserMixin,db.Model):
     name=db.Column(db.String(60))
     email=db.Column(db.String(100))
     password=db.Column(db.String(100))
+    product=db.relationship('Product', lazy='select')
 
 class Product(db.Model):
     id=db.Column(db.Integer, primary_key=True)
@@ -28,6 +29,7 @@ class Product(db.Model):
     img_url=db.Column(db.String(100))
     price=db.Column(db.Integer)
     description=db.Column(db.String(100))
+    user_id=db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
 with app.app_context():
@@ -73,7 +75,7 @@ def add_product():
         name=request.form['name']
         price=request.form['price']
         description=request.form['description']
-        new_product=Product(img_url=img_url, name=name, price=price, description=description)
+        new_product=Product(img_url=img_url, name=name, price=price, description=description, user_id=current_user.id)
         db.session.add(new_product)
         db.session.commit()
     return render_template('add_product.html')
@@ -82,7 +84,8 @@ def add_product():
 @app.route('/products_view', methods=['POST', 'GET'])
 @login_required
 def products_view():
-    return render_template('products_view.html')
+    user_products=Product.query.filter_by(user_id=current_user.id)
+    return render_template('products_view.html', user_products=user_products)
 
 @app.route('/logout')
 @login_required
